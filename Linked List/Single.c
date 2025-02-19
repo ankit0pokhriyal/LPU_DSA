@@ -13,10 +13,10 @@ void traversal() {
         printf("List empty\n");
     } else {
         struct Node *ptr = start;
-        do {
+        while (ptr != NULL) {
             printf("%d ", ptr->data);
             ptr = ptr->next;
-        } while (ptr != start);
+        }
         printf("\n");
     }
 }
@@ -24,90 +24,68 @@ void traversal() {
 void insertBeg(int num) {
     struct Node *new_node = (struct Node*)malloc(sizeof(struct Node));
     new_node->data = num;
-    if (start == NULL) {
-        start = new_node;
-        new_node->next = start;
-    } else {
-        struct Node *ptr = start;
-        while (ptr->next != start) {
-            ptr = ptr->next;
-        }
-        ptr->next = new_node;
-        new_node->next = start;
-        start = new_node;
-    }
+    new_node->next = start;
+    start = new_node;
 }
 
 void insertEnd(int num) {
     struct Node *new_node = (struct Node*)malloc(sizeof(struct Node));
     new_node->data = num;
+    new_node->next = NULL;
+    
     if (start == NULL) {
         start = new_node;
-        new_node->next = start;
     } else {
         struct Node *ptr = start;
-        while (ptr->next != start) {
+        while (ptr->next != NULL) {
             ptr = ptr->next;
         }
         ptr->next = new_node;
-        new_node->next = start;
     }
 }
 
 void insertAfter(int num, int val) {
-    if (start == NULL) {
-        printf("List empty\n");
-        return;
-    }
-    struct Node *new_node = (struct Node*)malloc(sizeof(struct Node));
-    new_node->data = num;
     struct Node *ptr = start;
-    do {
+    while (ptr != NULL) {
         if (ptr->data == val) {
+            struct Node *new_node = (struct Node*)malloc(sizeof(struct Node));
+            new_node->data = num;
             new_node->next = ptr->next;
             ptr->next = new_node;
             return;
         }
         ptr = ptr->next;
-    } while (ptr != start);
-
+    }
     printf("Value not found\n");
-    free(new_node); 
 }
+
 void deleteBeg() {
     if (start == NULL) {
         printf("List empty\n");
-    } else if (start->next == start) {
-        free(start);
-        start = NULL;
-    } else {
-        struct Node *ptr = start;
-        while (ptr->next != start) {
-            ptr = ptr->next;
-        }
-        struct Node *temp = start;
-        start = start->next;
-        ptr->next = start;
-        free(temp);
+        return;
     }
+    struct Node *temp = start;
+    start = start->next;
+    free(temp);
 }
 
 void deleteEnd() {
     if (start == NULL) {
         printf("List empty\n");
-    } else if (start->next == start) {
+        return;
+    }
+    if (start->next == NULL) {
         free(start);
         start = NULL;
-    } else {
-        struct Node *ptr = start;
-        struct Node *preptr = NULL;
-        while (ptr->next != start) {
-            preptr = ptr;
-            ptr = ptr->next;
-        }
-        preptr->next = start;
-        free(ptr);
+        return;
     }
+    struct Node *ptr = start, *preptr = NULL;
+    while (ptr->next != NULL) {
+        preptr = ptr;
+        ptr = ptr->next;
+    }
+    preptr->next = NULL;
+    free(ptr);
 }
 
 void deleteAtPos(int val) {
@@ -115,34 +93,21 @@ void deleteAtPos(int val) {
         printf("List empty\n");
         return;
     }
-    if (start->next == start && start->data == val) {
-        free(start);
-        start = NULL;
+    if (start->data == val) {
+        deleteBeg();
         return;
     }
-    struct Node *preptr = NULL, *ptr = start;
-    do {
-        if (ptr->data == val) {
-            break;
-        }
+    struct Node *ptr = start, *preptr = NULL;
+    while (ptr != NULL && ptr->data != val) {
         preptr = ptr;
         ptr = ptr->next;
-    } while (ptr != start);
-
-    if (ptr->data == val) {
-        if (ptr == start) {
-            deleteBeg();
-        } else {
-            if (ptr->next == start) {
-                deleteEnd();
-            } else {
-                preptr->next = ptr->next;
-                free(ptr);
-            }
-        }
-    } else {
-        printf("Value not found\n");
     }
+    if (ptr == NULL) {
+        printf("Value not found\n");
+        return;
+    }
+    preptr->next = ptr->next;
+    free(ptr);
 }
 
 int main() {
@@ -151,16 +116,22 @@ int main() {
     insertEnd(3);
     insertEnd(4);
     insertAfter(5, 3);
-    traversal(); 
+    traversal();
+
     deleteBeg();
-    traversal(); 
+    traversal();
+
     deleteEnd();
-    traversal(); 
+    traversal();
+
     deleteAtPos(3);
-    traversal(); 
+    traversal();
+
     deleteAtPos(1);
-    traversal(); 
+    traversal();
+
     deleteAtPos(5);
-    traversal(); 
+    traversal();
+
     return 0;
 }
